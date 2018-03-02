@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true"
+        android:drawable="@mipmap/ic_arrow_right">
+        <size
+            android:height="17dp"
+            android:width="17dp"/>
+    </item>
+    <item android:state_selected="true"
+        android:drawable="@mipmap/ic_arrow_right">
+        <size
+            android:height="17dp"
+            android:width="17dp"/>
+    </item>
+
+    <item android:state_active="true"
+        android:drawable="@mipmap/ic_arrow_right">
+        <size
+            android:height="17dp"
+            android:width="17dp"/>
+    </item>
+
+    <item  android:drawable="@mipmap/ic_arrow_down">
+        <size
+            android:height="17dp"
+            android:width="17dp"/>
+    </item>
+
+    <item android:state_checked="true"
+        android:drawable="@mipmap/ic_arrow_right">
+        <size
+            android:height="17dp"
+            android:width="17dp"/>
+    </item>
+
+    <item android:state_enabled="true"
+        android:drawable="@mipmap/ic_arrow_right">
+        <size
+            android:height="17dp"
+            android:width="17dp"/>
+    </item>
+    <item android:state_accelerated="true"
+        android:drawable="@mipmap/ic_arrow_right">
+        <size
+            android:height="17dp"
+            android:width="17dp"/>
+    </item>
+    <item android:state_focused="true"
+        android:drawable="@mipmap/ic_arrow_right">
+        <size
+            android:height="17dp"
+            android:width="17dp"/>
+    </item>
+
+
+</selector>
