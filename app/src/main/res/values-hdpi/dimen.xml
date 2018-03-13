@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Category Button -->
+    <dimen name="categoryButtonFont">9sp</dimen>
+    <dimen name="categoryButtonPaddingLeft">7dp</dimen>
+    <dimen name="categoryButtonPaddingTop">2dp</dimen>
+
+    <!-- Envent Description -->
+    <dimen name="event_item_height">69dp</dimen>
+    <dimen name="event_title">10sp</dimen>
+    <dimen name="eventTime">13sp</dimen>
+    <dimen name="event_favorites_width">39dp</dimen>
+    <dimen name="event_scroll_bar_width">36dp</dimen>
+    <dimen name="event_title_margin_right">205dp</dimen>
+    <dimen name="map_date_active">14sp</dimen>
+    <dimen name="map_date_inactive">13sp</dimen>
+
+</resources>

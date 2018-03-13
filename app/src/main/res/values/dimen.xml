@@ -2,5 +2,9 @@
 <resources>
     <dimen name="photo_dialog_height">147dp</dimen>
     <dimen name="photo_dialog_width">191dp</dimen>
+    <dimen name="photo_dialog_img_height">103dp</dimen>
+    <dimen name="photo_dialog_img_width">164dp</dimen>
     <dimen name="photo_dialog_margin_bottom">12.5dp</dimen>
+    <dimen name="map_date_active">14sp</dimen>
+    <dimen name="map_date_inactive">13sp</dimen>
 </resources>

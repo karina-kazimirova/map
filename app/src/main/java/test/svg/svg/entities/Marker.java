@@ -7,7 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public class MapDrawableIcon extends Drawable {
+public class Marker extends Drawable {
     private float coordinatesFloatX;
     private float coordinatesFloatY;
     private float markerScale;
@@ -15,9 +15,11 @@ public class MapDrawableIcon extends Drawable {
     private String markerType;
     private String markerName;
     private boolean isEvent;
+    private int markerId;
 
-    public MapDrawableIcon(float coordinatesFloatX, float coordinatesFloatY, float markerScale,
-                           String photoUrl, String markerType, String markerName, boolean isEvent) {
+    public Marker(float coordinatesFloatX, float coordinatesFloatY, float markerScale,
+                  String photoUrl, String markerType, String markerName, boolean isEvent,
+                  int markerId) {
         this.coordinatesFloatX = coordinatesFloatX;
         this.coordinatesFloatY = coordinatesFloatY;
         this.markerScale = markerScale;
@@ -25,6 +27,15 @@ public class MapDrawableIcon extends Drawable {
         this.markerType = markerType;
         this.markerName = markerName;
         this.isEvent = isEvent;
+        this.markerId = markerId;
+    }
+
+    public int getMarkerId() {
+        return markerId;
+    }
+
+    public void setMarkerId(int markerId) {
+        this.markerId = markerId;
     }
 
     public boolean isEvent() {

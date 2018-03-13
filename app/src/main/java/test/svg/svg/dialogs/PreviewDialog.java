@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Window;
 import android.view.WindowManager;
@@ -59,10 +60,14 @@ public class PreviewDialog extends Dialog {
         window = getWindow();
         setBackground(window);
         imageView = (ImageView) findViewById(R.id.photo_preview);
+        float imageWidth = getContext().getResources().getDimension(R.dimen.photo_dialog_img_width);
+        int imageWidthDp = (int) (imageWidth * getContext().getResources().getDisplayMetrics().density);
+        float imageHeight  = getContext().getResources().getDimension(R.dimen.photo_dialog_img_height);
+        int imageHeightDp = (int) (imageHeight * getContext().getResources().getDisplayMetrics().density);
         Glide
                 .with(getContext())
                 .load(photoUrl)
-                .override(660, 412)
+                .override(imageWidthDp, imageHeightDp)
                 .centerCrop()
                 .into(imageView);
     }
@@ -73,6 +78,7 @@ public class PreviewDialog extends Dialog {
         int viewHeight = (int) getContext().getResources().getDimension(R.dimen.photo_dialog_height);
         int viewWidth = (int) getContext().getResources().getDimension(R.dimen.photo_dialog_width);
         layoutParams.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+        int displayHeight = getContext().getResources().getDisplayMetrics().heightPixels;
         layoutParams.y = (int) locationY - viewHeight;
 
         if (locationY < getContext().getResources().getDisplayMetrics().heightPixels / 2) {

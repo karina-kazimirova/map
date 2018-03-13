@@ -1,5 +1,7 @@
 package test.svg.svg.entities;
 
+import java.util.List;
+
 public class MarkerArea {
     private float startX;
     private float endX;
@@ -11,11 +13,12 @@ public class MarkerArea {
     private String markerType;
     private String markerName;
     private boolean isEvent;
+    private List<Event> eventList;
 
 
     public MarkerArea(float startX, float endX, float startY, float endY, float markerWidth,
                       float markerHeight, String photoUrl, String markerType, String markerName,
-                      boolean isEvent) {
+                      boolean isEvent, List<Event> eventList) {
         this.startX = startX;
         this.endX = endX;
         this.startY = startY;
@@ -26,6 +29,15 @@ public class MarkerArea {
         this.markerType = markerType;
         this.markerName = markerName;
         this.isEvent = isEvent;
+        this.eventList = eventList;
+    }
+
+    public List<Event> getEventList() {
+        return eventList;
+    }
+
+    public void setEventList(List<Event> eventList) {
+        this.eventList = eventList;
     }
 
     public boolean isEvent() {

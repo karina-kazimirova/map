@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Category Button -->
+    <dimen name="categoryButtonFont">49sp</dimen>
+    <dimen name="categoryButtonPaddingLeft">7dp</dimen>
+    <dimen name="categoryButtonPaddingTop">3dp</dimen>
+
+    <!-- Envent Description -->
+    <dimen name="event_title">10sp</dimen>
+    <dimen name="eventTime">13sp</dimen>
+    <dimen name="map_date_active">14sp</dimen>
+    <dimen name="map_date_inactive">13sp</dimen>
+
+</resources>

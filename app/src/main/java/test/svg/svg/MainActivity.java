@@ -4,12 +4,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import test.svg.svg.dialogs.MapDialogFragment;
 import test.svg.svg.svgandroid_library.SVG;
 import test.svg.svg.svgandroid_library.SVGParser;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
     private ZoomView zoomView;
     private SVG svg;
     private MapDialogFragment mapDialogFragment;

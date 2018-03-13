@@ -17,7 +17,8 @@ import java.util.List;
 import test.svg.svg.dialogs.BottomSheetHint;
 import test.svg.svg.dialogs.BottomSheetSpoilerHint;
 import test.svg.svg.dialogs.PreviewDialog;
-import test.svg.svg.entities.MapDrawableIcon;
+import test.svg.svg.entities.Event;
+import test.svg.svg.entities.Marker;
 import test.svg.svg.entities.MarkerArea;
 
 
@@ -27,7 +28,7 @@ public class ZoomView extends android.support.v7.widget.AppCompatImageView {
     private static float normalizedScale;
     private float scaleFactor;
     private float minScaleFactor;
-    private ScaleGestureDetector detector;
+    private ScaleGestureDetector scaleDetector;
     private GestureDetector gestureDetector;
     private static int NONE;
     private static int DRAG;
@@ -42,7 +43,7 @@ public class ZoomView extends android.support.v7.widget.AppCompatImageView {
     private float translateY;
     private float previousTranslateX;
     private float previousTranslateY;
-    private List<MapDrawableIcon> mapDrawableList;
+    private List<Marker> markersList;
     private List<MarkerArea> markerAreas;
     private Controller controller;
     private Paint paint;
@@ -54,7 +55,7 @@ public class ZoomView extends android.support.v7.widget.AppCompatImageView {
     private float distancesY;
     private PreviewDialog dialog;
     private BottomSheetDialog bottomSheetDialog;
-
+    private List<Event> eventList;
 
     public ZoomView(Context context, Drawable mapBackground) {
         super(context);
@@ -79,7 +80,7 @@ public class ZoomView extends android.support.v7.widget.AppCompatImageView {
         MIN_ZOOM = 1;
         MAX_ZOOM = 3;
         normalizedScale = 1;
-        scaleFactor = 1.f;
+        scaleFactor = 1f;
         minScaleFactor = 1;
         distancesX = 0;
         distancesY = 0;
@@ -92,33 +93,34 @@ public class ZoomView extends android.support.v7.widget.AppCompatImageView {
         translateY = 0f;
         previousTranslateX = 0f;
         previousTranslateY = 0f;
-        detector = new ScaleGestureDetector(getContext(), new ScaleListener());
+        scaleDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
         gestureDetector = new GestureDetector(getContext(), new MyGestureListener());
         displayHeight = getContext().getResources().getDisplayMetrics().heightPixels;
         displayWidth = getContext().getResources().getDisplayMetrics().widthPixels;
         mapHeight = mapBackground.getIntrinsicHeight();
         mapWidth = mapBackground.getIntrinsicWidth();
         controller = new Controller();
-        mapDrawableList = controller.getList();
+        markersList = controller.getList();
         paint = new Paint(Paint.FILTER_BITMAP_FLAG);
         paint.setAntiAlias(true);
         paint.setDither(true);
         paint.setFilterBitmap(true);
     }
 
+
     // set markers to map
     private void initializeMap(Canvas canvas) {
         markerAreas = new ArrayList<>();
 
-        for (int i = 0; i < mapDrawableList.size(); i++) {
-            Bitmap markerBitmap = createBitmap(mapDrawableList.get(i));
+        for (int i = 0; i < markersList.size(); i++) {
+            Bitmap markerBitmap = createBitmap(markersList.get(i));
 
             float posX = getCoordinate(mapWidth,
-                    mapDrawableList.get(i).getCoordinatesFloatX());
+                    markersList.get(i).getCoordinatesFloatX());
             float posY = getCoordinate(mapHeight,
-                    mapDrawableList.get(i).getCoordinatesFloatY());
+                    markersList.get(i).getCoordinatesFloatY());
 
-            float markerScaleFactor = mapDrawableList.get(i).getMarkerScale();
+            float markerScaleFactor = markersList.get(i).getMarkerScale();
             float markerWidth = markerBitmap.getWidth() * markerScaleFactor;
             float markerHeight = markerBitmap.getHeight() * markerScaleFactor;
 
@@ -127,12 +129,15 @@ public class ZoomView extends android.support.v7.widget.AppCompatImageView {
 
             canvas.drawBitmap(scaleBitmap, posX, posY, paint);
 
+            //get list of events by this marker
+            eventList = controller.getEventByMarkerId(markersList.get(i).getMarkerId());
+
             markerAreas.add(new MarkerArea(posX - markerWidth, posX + markerWidth,
                     posY - markerHeight, posY + markerHeight, markerWidth, markerHeight,
-                    mapDrawableList.get(i).getPhotoUrl(),
-                    mapDrawableList.get(i).getMarkerType(),
-                    mapDrawableList.get(i).getMarkerName(),
-                    mapDrawableList.get(i).isEvent()));
+                    markersList.get(i).getPhotoUrl(),
+                    markersList.get(i).getMarkerType(),
+                    markersList.get(i).getMarkerName(),
+                    markersList.get(i).isEvent(), eventList));
         }
     }
 
@@ -140,27 +145,24 @@ public class ZoomView extends android.support.v7.widget.AppCompatImageView {
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                mode = DRAG;
                 startX = event.getX() - previousTranslateX;
                 startY = event.getY() - previousTranslateY;
 
-                // Get click coordinate on finger down
-                float clickPositionX = event.getX();
-                float clickPositionY = event.getY();
                 float startAreaX;
                 float endAreaX;
                 float startAreaY;
                 float endAreaY;
 
                 for (int i = 0; i < markerAreas.size(); i++) {
-                    startAreaX = markerAreas.get(i).getStartX() - distancesX;
-                    endAreaX = markerAreas.get(i).getEndX() - distancesX;
-                    startAreaY = markerAreas.get(i).getStartY();
-                    endAreaY = markerAreas.get(i).getEndY();
+                    startAreaX = markerAreas.get(i).getStartX() * scaleFactor - distancesX;
+                    endAreaX = markerAreas.get(i).getEndX() * scaleFactor - distancesX;
+                    startAreaY = markerAreas.get(i).getStartY() * scaleFactor - distancesY;
+                    endAreaY = markerAreas.get(i).getEndY()* scaleFactor - distancesY;
 
-                    if ((clickPositionX >= startAreaX && clickPositionX <= endAreaX) &&
-                            (clickPositionY >= startAreaY && clickPositionY <= endAreaY)) {
-                        showDialogs(markerAreas.get(i), startAreaX, endAreaY);
+                    if ((event.getX() >= startAreaX && event.getX() <= endAreaX) &&
+                            (event.getY() >= startAreaY && event.getY() <= endAreaY)) {
+                        showDialogs(markerAreas.get(i), startAreaX, endAreaY,
+                                markerAreas.get(i).getEventList());
                         scrollByCenter(startAreaX + markerAreas.get(i).getMarkerWidth()
                                 * 1.5f);
                     }
@@ -171,6 +173,7 @@ public class ZoomView extends android.support.v7.widget.AppCompatImageView {
                 mode = ZOOM;
                 previousTranslateX = distancesX;
                 previousTranslateY = translateY;
+
                 break;
 
             case MotionEvent.ACTION_MOVE:
@@ -198,7 +201,7 @@ public class ZoomView extends android.support.v7.widget.AppCompatImageView {
                 previousTranslateY = translateY;
                 break;
         }
-        detector.onTouchEvent(event);
+        scaleDetector.onTouchEvent(event);
         gestureDetector.onTouchEvent(event);
 
         if ((mode == DRAG && scaleFactor != normalizedScale && dragged) || mode == ZOOM) {
@@ -208,19 +211,22 @@ public class ZoomView extends android.support.v7.widget.AppCompatImageView {
     }
 
     // show dialogs
-    private void showDialogs(MarkerArea markerArea, float startAreaX, float endAreaY) {
+    private void showDialogs(MarkerArea markerArea, float startAreaX, float endAreaY,
+                             List<Event> eventList) {
         dialog = new PreviewDialog(getContext(), markerArea.getPhotoUrl(),
                 startAreaX + markerArea.getMarkerWidth() / 1.5f,
                 endAreaY + markerArea.getMarkerHeight());
 
         bottomSheetDialog = markerArea.isEvent() ?
-                new BottomSheetSpoilerHint(getContext(), markerArea.getMarkerName(), dialog) :
+                new BottomSheetSpoilerHint(getContext(), markerArea.getMarkerName(), dialog,
+                        eventList) :
                 new BottomSheetHint(getContext(), markerArea.getMarkerName(), dialog);
         bottomSheetDialog.show();
     }
 
     /**
      * centering the map when selecting a marker
+     *
      * @param markerPosX position of marker along the x-axis
      */
     private void scrollByCenter(float markerPosX) {
@@ -251,33 +257,17 @@ public class ZoomView extends android.support.v7.widget.AppCompatImageView {
         if (displayHeight < mapHeight) {
             minScaleFactor = displayHeight / mapHeight;
             canvas.scale(minScaleFactor, minScaleFactor);
+        } else {
+            canvas.scale(scaleFactor, scaleFactor);
         }
-
-        canvas.scale(scaleFactor, scaleFactor);
-
-        if ((translateX * -normalizedScale) < 0) {
-            translateX = 0;
-        } else if ((translateX * -normalizedScale) > (scaleFactor - normalizedScale) * mapWidth) {
-            translateX = (normalizedScale - scaleFactor) * mapWidth;
-        }
-        if (translateY * -normalizedScale < 0) {
-            translateY = 0;
-        } else if ((translateY * -normalizedScale) > (scaleFactor - normalizedScale) *
-                mapHeight) {
-            translateY = (normalizedScale - scaleFactor) * mapHeight;
-        }
-
-        canvas.translate(translateX / scaleFactor, translateY / scaleFactor);
-        canvas.save();
         mapBackground.draw(canvas);
         initializeMap(canvas);
     }
 
-
     // convert marker type to bitmap source
-    private Bitmap createBitmap(MapDrawableIcon mapDrawableIcon) {
+    private Bitmap createBitmap(Marker marker) {
         MarkersDisplay markersDisplay = MarkersDisplay.POINTER;
-        markersDisplay = markersDisplay.getIndexByType(mapDrawableIcon.getMarkerType());
+        markersDisplay = markersDisplay.getIndexByType(marker.getMarkerType());
         return BitmapFactory.decodeResource(getResources(), markersDisplay.getMarkerId());
     }
 
@@ -296,20 +286,49 @@ public class ZoomView extends android.support.v7.widget.AppCompatImageView {
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            scaleFactor *= detector.getScaleFactor();
-            scaleFactor = Math.max(MIN_ZOOM, Math.min(scaleFactor, MAX_ZOOM));
+            float currentScaleFactor = detector.getScaleFactor();
+            float focusX = detector.getFocusX();
+            float focusY = detector.getFocusY();
+
+            if (scaleFactor * currentScaleFactor > MIN_ZOOM &&
+                    scaleFactor * currentScaleFactor < MAX_ZOOM) {
+                scaleFactor *= detector.getScaleFactor();
+                scaleFactor = Math.max(MIN_ZOOM, Math.min(scaleFactor, MAX_ZOOM));
+
+                int scrollX = (int) ((getScrollX() + focusX) * currentScaleFactor - focusX);
+                scrollX = Math.min(Math.max(scrollX, 0), mapWidth);
+
+                int scrollY = (int) ((getScrollY() + focusY) * currentScaleFactor - focusY);
+                scrollY = Math.min(Math.max(scrollY, 0), mapHeight);
+
+                scrollTo(scrollX, scrollY);
+                invalidate();
+            }
             return true;
+        }
+        @Override
+        public void onScaleEnd(ScaleGestureDetector detector) {
+            distancesX = getScrollX();
+            distancesY = getScrollY();
         }
     }
 
     private class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            if (getScrollX() + distanceX < (mapWidth * minScaleFactor - displayWidth) &&
-                    getScrollX() + distanceX > 0) {
+            int scaledMapWidth = (int) ((mapWidth * minScaleFactor) * scaleFactor);
+            int scaledMapHeight = (int) ((mapHeight * minScaleFactor) * scaleFactor);
+            if (getScrollX() + distanceX < (scaledMapWidth - displayWidth)
+                    && getScrollX() + distanceX > 0) {
                 scrollBy((int) distanceX, 0);
                 distancesX = getScrollX();
             }
+            if (getScrollY() + distanceY < (scaledMapHeight - displayHeight)
+                    && getScrollY() + distanceY > 0) {
+                scrollBy(0, (int) distanceY);
+                distancesY = getScrollY();
+            }
+            invalidate();
             return true;
         }
     }

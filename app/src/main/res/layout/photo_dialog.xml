@@ -3,13 +3,13 @@
     android:layout_width="@dimen/photo_dialog_width"
     android:layout_height="@dimen/photo_dialog_height"
     android:background="@mipmap/photo_prev_bg"
-    android:paddingBottom="15dp">
+    android:paddingBottom="16dp">
 
     <ImageView
         android:id="@+id/photo_preview"
-        android:layout_width="165dp"
-        android:layout_height="103dp"
-        android:layout_centerInParent="true"
-        android:layout_alignParentBottom="true" />
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/photo_dialog_img_height"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="-1dp" />
 
 </RelativeLayout>
