@@ -1,5 +1,8 @@
 package test.svg.svg;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import java.util.Timer;
@@ -12,13 +15,15 @@ public class MainActivity extends AppCompatActivity {
     private ZoomView zoomView;
     private SVG svg;
     private MapDialogFragment mapDialogFragment;
+    private ScrollTouchImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         svg = SVGParser.getSVGFromResource(getResources(), R.raw.map3);
+        imageView = new ScrollTouchImageView(this, svg.createPictureDrawable());
         zoomView = new ZoomView(this, svg.createPictureDrawable());
-        setContentView(zoomView);
+        setContentView(imageView);
     }
 
     @Override
